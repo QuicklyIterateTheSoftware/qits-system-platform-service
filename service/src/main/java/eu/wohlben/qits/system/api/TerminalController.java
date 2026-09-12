@@ -34,6 +34,10 @@ import java.util.UUID;
  * <p><b>Validation happens HERE and resolution happens against the daemon</b>, so that by the time
  * a {@link TerminalLaunch} exists, every string in it is either an enum or something the daemon
  * itself printed.
+ *
+ * <p>The two reads also take {@code qits:agent}: an agent may see which terminals exist. Opening
+ * and ending one stays with the class-level pair. A method-level {@code @RolesAllowed} replaces the
+ * class-level one, so each read names all three roles.
  */
 @Path("/terminals")
 @Produces(MediaType.APPLICATION_JSON)
@@ -45,12 +49,14 @@ public class TerminalController {
   @Inject NodeReads nodes;
 
   @GET
+  @RolesAllowed({"qits:admin", "qits:system", "qits:agent"})
   public List<TerminalView> list() {
     return sessions.list().stream().map(TerminalView::of).toList();
   }
 
   @GET
   @Path("/{id}")
+  @RolesAllowed({"qits:admin", "qits:system", "qits:agent"})
   public TerminalView get(@PathParam("id") String id) {
     return TerminalView.of(require(id));
   }

@@ -28,7 +28,7 @@ import java.util.List;
  */
 @Path("/nodes")
 @Produces(MediaType.APPLICATION_JSON)
-@RolesAllowed({"qits:admin", "qits:system"})
+@RolesAllowed({"qits:admin", "qits:system", "qits:agent"})
 public class NodeController {
 
   @Inject NodeReads nodes;

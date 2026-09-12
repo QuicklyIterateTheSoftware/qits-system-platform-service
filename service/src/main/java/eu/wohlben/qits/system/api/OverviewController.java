@@ -14,12 +14,13 @@ import jakarta.ws.rs.core.MediaType;
  *
  * <p>Both roles, like every route here: {@code qits:admin} is a person in a browser (identity from
  * qits-gateway's X-Qits-User / X-Qits-Roles) and {@code qits:system} is a machine holding a bearer
- * this service's idp client minted. There is no anonymous route in this service and there must
- * never be one — what it reads is the shape of the host.
+ * this service's idp client minted. {@code qits:agent}, a commissioned agent, may read it too.
+ * There is no anonymous route in this service and there must never be one — what it reads is the
+ * shape of the host.
  */
 @Path("/overview")
 @Produces(MediaType.APPLICATION_JSON)
-@RolesAllowed({"qits:admin", "qits:system"})
+@RolesAllowed({"qits:admin", "qits:system", "qits:agent"})
 public class OverviewController {
 
   @Inject HostReads hosts;
