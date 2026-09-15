@@ -46,13 +46,15 @@ import java.util.Map;
 public class StoryProfile extends PackagedSurfaceIT.PackagedUnderTarget {
 
   /**
-   * The audience this service enforces, and it is a LITERAL rather than a variable name: {@code
-   * qits.auth.machine.audience=qits-platform-system} is spelled out in {@code
-   * application.properties} and {@code quarkus.oidc.token.audience} references it, so the audience
-   * under test is the shipped one and there is no expression to feed. A deployment still overrides
-   * it by environment.
+   * The audience this service enforces, and it is the PLATFORM's one audience rather than this
+   * service's name: qits-platform-idp stamps {@code qits-platform} on every token it mints, so a
+   * token carrying it is any platform caller's and roles are what decide what that caller may do.
+   *
+   * <p>It is spelled here as a literal because it is spelled as a literal where it ships — {@code
+   * quarkus.oidc.token.audience=qits-platform} in {@code application.properties}, with no
+   * expression to resolve — so the audience under test is the shipped one.
    */
-  public static final String AUDIENCE = "qits-platform-system";
+  public static final String AUDIENCE = "qits-platform";
 
   @Override
   public Map<String, String> getConfigOverrides() {
@@ -70,6 +72,12 @@ public class StoryProfile extends PackagedSurfaceIT.PackagedUnderTarget {
     // the platform edge. Both doors are open here, which is what lets one catalogue tell the
     // machine's ceiling from the person's.
     overrides.put("qits.auth.machine.required", "true");
+    // THE OTHER HALF OF THAT GATE, and the only reason this key is here at all: qits-auth-core's
+    // MachineAuth refuses to start with the gate on and no qits.auth.machine.audience, and the
+    // shipped properties do not set one — validation is pinned to the platform audience as a
+    // literal, and no route in this service calls MachineAuth.require(). So the catalogue states
+    // it, and states the same audience the receiver enforces.
+    overrides.put("qits.auth.machine.audience", AUDIENCE);
     // Where the idp is. Runtime key, so the packaged artifact is otherwise exactly what ships —
     // discovery stays off and jwks-path stays `jwks`, joined onto this URL.
     overrides.put("quarkus.oidc.auth-server-url", idp.baseUrl());

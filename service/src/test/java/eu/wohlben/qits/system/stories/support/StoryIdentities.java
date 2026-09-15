@@ -20,9 +20,9 @@ import java.util.Map;
  * <h2>A machine is a bearer this run's idp minted</h2>
  *
  * <p>{@link #machine(RequestSpecification)} presents a token signed by {@link MockIdp}'s generated
- * keypair, addressed to this service's audience and carrying {@code qits:system} in {@code groups}.
- * Every token is minted <b>fresh per call and never cached</b>: a helper that handed the same
- * string to two stories would make {@code assertNotLeaked} a weaker claim than it reads as.
+ * keypair, carrying the platform audience this service enforces and {@code qits:system} in {@code
+ * groups}. Every token is minted <b>fresh per call and never cached</b>: a helper that handed the
+ * same string to two stories would make {@code assertNotLeaked} a weaker claim than it reads as.
  *
  * <h2>Why both, in one catalogue</h2>
  *
@@ -77,7 +77,7 @@ public final class StoryIdentities {
     return Map.of(USER_HEADER, OPERATOR_NAME, ROLES_HEADER, role);
   }
 
-  /** A freshly minted platform-peer bearer: this service's audience, {@code qits:system}. */
+  /** A freshly minted platform-peer bearer: the platform audience, {@code qits:system}. */
   public static String machineToken() {
     return MockIdp.attach()
         .token()
