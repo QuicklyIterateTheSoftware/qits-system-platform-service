@@ -211,7 +211,7 @@ public class TokenValidationBootstrapIT {
         .as("host-greeted");
 
     // End (c), this service's side: those keys are what token validation now runs on. A platform
-    // peer's bearer (aud = this service, roles in `groups`) opens the landing read — no path
+    // peer's bearer (aud = the platform, roles in `groups`) opens the landing read — no path
     // parameter, nothing named, nothing written.
     //
     // The actor is set BEFORE the call: the tap sees a request, never a narrative role, and this is
@@ -228,7 +228,7 @@ public class TokenValidationBootstrapIT {
         .body("host.hostname", equalTo("fake-host"))
         .body("swarm.state", equalTo("active"));
     story
-        .note("a platform peer's bearer (aud=qits-platform-system, groups=[qits:system]) opens the"
+        .note("a platform peer's bearer (aud=qits-platform, groups=[qits:system]) opens the"
             + " landing read")
         .as("overview-served");
 
@@ -286,12 +286,12 @@ public class TokenValidationBootstrapIT {
   @UserStoryDescription(
       """
       The flip side of trusting the platform's keys. A token signed by a key the published JWKS
-      never carried, or minted for another service's audience, is refused at the door — however
-      well-formed it looks: both are 401 and not 403, because the credential never became an
-      identity and there is no caller to have been forbidden. A token addressed here and signed
-      correctly but carrying a role this service has never heard of gets the other answer, 403 —
-      it authenticated and covers nothing. There is no anonymous route in this service and there
-      must never be one: what it reads is the whole machine.
+      never carried, or minted for an audience that is not this platform's, is refused at the door —
+      however well-formed it looks: both are 401 and not 403, because the credential never became an
+      identity and there is no caller to have been forbidden. A token carrying the platform audience
+      and signed correctly but bearing a role this service has never heard of gets the other answer,
+      403 — it authenticated and covers nothing. There is no anonymous route in this service and
+      there must never be one: what it reads is the whole machine.
       """)
   @Order(2)
   void aStrangersTokenIsRefused(Interactions story) {
@@ -321,19 +321,24 @@ public class TokenValidationBootstrapIT {
         .note("a token signed by a key the published JWKS never carried is refused")
         .as("unknown-key-refused");
 
-    String wrongAudienceToken =
+    // AND THE AUDIENCE THIS IS NOT IS WORTH BEING PRECISE ABOUT. A sibling platform service's
+    // bearer is not it: qits-platform-idp stamps `qits-platform` on every token it mints, so a
+    // peer's credential is addressed here too and its ROLES are what decide what it may do. What
+    // is refused is a token that was never addressed to this platform at all — an aud naming
+    // something outside it, which is the only thing the audience check can still be about.
+    String foreignAudienceToken =
         idp.token()
-            .audience("some-other-service")
+            .audience("some-other-platform")
             .groups(StoryIdentities.MACHINE_ROLE)
             .mint();
-    MINTED.add(wrongAudienceToken);
-    StoryIdentities.bearer(given(), wrongAudienceToken)
+    MINTED.add(foreignAudienceToken);
+    StoryIdentities.bearer(given(), foreignAudienceToken)
         .get(StoryTarget.OVERVIEW)
         .then()
         .statusCode(401);
     story
-        .note("a token minted for another service's audience is refused just the same — 401 and not"
-            + " 403, because the credential never became an identity")
+        .note("a token that carries no platform audience at all is refused just the same — 401 and"
+            + " not 403, because the credential never became an identity")
         .as("wrong-audience-refused");
 
     // The third door, and the one that proves the groups→roles mapping really ran rather than being
