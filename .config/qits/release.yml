@@ -1,0 +1,4 @@
+archetype: java-service
+artifacts:
+  - { type: docker, name: qits/qits-platform-system, sbom: .sbom/sbom.json }
+userflows: true
