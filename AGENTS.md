@@ -155,11 +155,14 @@ it down with them.
 ## The story catalogue
 
 **Seven `@UserStory` methods over four `@QuarkusIntegrationTest` classes**, emitting
-`service/target/userstories/` and published by the userflow half of
-`.config/qits/ci-event-release-request.yml`, once per release-request fold, as
-`@userflows/qits-platform-system`. That half declares `gating: false`: a red story shows the run red
-without holding the fold at the release gate. `skipITs` stays true and the pipeline names the
-classes; a new story class joins that `-Dit.test` list **in the same commit**, or it is silently
+`service/target/userstories/` and published by the verify half of the release-request phase
+(`.config/qits/release.yml` declares the `java-service` archetype and overrides no slot), once per
+release-request fold, as `@userflows/qits-system-platform-service` — the repository's own name,
+which is what `userflows: true` means. That half **gates**, like every step of the composed
+pipeline: a red story is a red verdict for the whole fold and holds it at the release gate, and
+there is no per-step exemption to declare — qits-ci refuses one. `skipITs` stays true and the
+pipeline names the classes; a new story class joins `.config/qits/userflow-stories` — one class name
+per line, which the archetype turns into `-Dit.test` — **in the same commit**, or it is silently
 never run.
 
     api/TokenValidationBootstrapIT      authentication  the packaged boot: the JWKS fetch, the boot
