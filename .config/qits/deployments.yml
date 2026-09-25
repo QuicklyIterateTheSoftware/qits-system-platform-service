@@ -6,18 +6,11 @@
 # finalizes `main` there and then, while a deployable one waits for the deployment to succeed. What
 # deploys is the VERSION COORDINATE the release build published, never a branch.
 #
-# PLATFORM service: one instance per platform, not one per environment. It is the right tier because
-# what it shows is the MACHINE — one host, one docker daemon, one swarm — and every environment on
-# it shares all three. A per-environment instance would be two services holding the same socket and
-# showing the same node twice, and each would sweep the other's terminal containers on boot.
-
 # THE NAME THIS DEPLOYS AS, spelled because the repository is renamed and the application is not.
 # Every derivation the deployer makes hangs off this name — the wire alias peers dial, the container
 # it manages, the extras family, the database — so letting it follow the repository would
 # decommission the running service and start a stranger beside it.
 application: qits-platform-system
-
-deployment_target: platform
 
 # One route for this application's machine surface: the API at /system/api, the terminal WebSocket at
 # /system/api/terminals/{id} and the document at /system/q. The edge path-routes every application's
