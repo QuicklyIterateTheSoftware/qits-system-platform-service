@@ -1,6 +1,12 @@
 archetype: java-service
 artifacts:
-  - { type: docker, name: qits/qits-platform-system, sbom: .sbom/sbom.json }
+# THE IMAGE COORDINATE IS THE APPLICATION NAME, and it has to move WITH it in the same
+# release. The deployer derives what to pull from the application in deployments.yml —
+# `qits/<application>:<version>` — so an application renamed without this line publishes
+# under the old coordinate and the deployment fails IMAGE_MISSING with a reference nothing
+# ever pushed. Measured on 2026.926.31915:
+#   no image registry.dev.localhost:8080/qits/qits-system:2026.926.31915
+  - { type: docker, name: qits/qits-system, sbom: .sbom/sbom.json }
 # THE SITE IS SPELLED, AND IT NAMES THE COMPONENT. `true` derives it from the REPOSITORY name,
 # which would put the retired tier modifier in a storage id and then MOVE that id the day the
 # repository is renamed — a bundle's history stranded under a name nothing publishes to any
