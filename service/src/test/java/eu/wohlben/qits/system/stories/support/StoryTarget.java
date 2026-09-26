@@ -17,8 +17,17 @@ public final class StoryTarget {
   /**
    * How every diagram in this catalogue names the launched process, on both sides of an edge: it is
    * the {@code to} of everything a story sends here and the {@code from} of everything it spawns.
+   *
+   * <p>It is the DEPLOYED name, and it has to be, because {@code TokenValidationBootstrapIT} builds
+   * the boot sweep's expected docker line out of it — {@code ps -aq --filter
+   * label=qits.system.owner=} plus this — and that value comes from {@code
+   * quarkus.application.name} through {@code qits.system.terminals.owner}. So this constant is not
+   * free to be a pretty label: it tracks the application name, and it moved from {@code
+   * qits-platform-system} to {@code qits-system} when the platform plane was deleted. The {@code
+   * networkHash} moves once with it and then settles, which is the normal consequence of renaming a
+   * node and not a failure.
    */
-  public static final String SERVICE = "qits-platform-system";
+  public static final String SERVICE = "qits-system";
 
   /** The machine surface's root. Path-routed verbatim by the edge on every host. */
   public static final String API = "/system/api";

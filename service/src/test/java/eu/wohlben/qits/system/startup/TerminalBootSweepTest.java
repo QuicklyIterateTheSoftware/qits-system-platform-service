@@ -52,8 +52,15 @@ class TerminalBootSweepTest {
     // THE FILTER IS THE OWNER LABEL, and its value is this application's name — not a name prefix,
     // and not the bare label. Two platforms can share one docker daemon, and a sweep that reaped
     // every qits.system.owner container would kill the other one's live terminals on every restart.
+    //
+    // The literal is spelled out rather than read back from config on purpose: asserting
+    // `quarkus.application.name` against itself would pass for any value, including an empty one,
+    // and the point of the assertion is that the sweep filters on THE DEPLOYED NAME. That makes this
+    // line move whenever the name does — it moved to qits-system when the platform plane was deleted
+    // and qits-platform-system stopped being an address anything on the estate answers on — and the
+    // move is the test doing its job, not friction to route around.
     assertTrue(
-        FakeDocker.called("ps -aq --filter label=qits.system.owner=qits-platform-system"),
+        FakeDocker.called("ps -aq --filter label=qits.system.owner=qits-system"),
         FakeDocker.calls().toString());
     assertTrue(FakeDocker.called("rm -f abc123 def456"), FakeDocker.calls().toString());
   }
