@@ -1,4 +1,4 @@
-# How qits-platform-deployments deploys this repo. It reads this file from the git host at the built
+# How qits-deployments deploys this repo. It reads this file from the git host at the built
 # sha, so the answer travels with the commit.
 #
 # CARRYING THE FILE AT ALL is the other thing it says. qits-projects reads it at the release tag to
@@ -10,7 +10,7 @@
 # Every derivation the deployer makes hangs off this name — the wire alias peers dial, the container
 # it manages, the extras family, the database — so letting it follow the repository would
 # decommission the running service and start a stranger beside it.
-application: qits-platform-system
+application: qits-system
 
 # One route for this application's machine surface: the API at /system/api, the terminal WebSocket at
 # /system/api/terminals/{id} and the document at /system/q. The edge path-routes every application's
@@ -23,7 +23,7 @@ routes: /system
 # after Orchestrator:3.
 #
 # The host is not spelled because the derived one is already right: the application name minus its
-# `qits-platform-` prefix is `system`, which is the label this service is served on. The terminal
+# `qits-` prefix is `system`, which is the label this service is served on. The terminal
 # socket's origin check needs that agreement: the page's origin and the forwarded host are the same
 # name, so the handshake passes.
 navigation-entries: system.System:4
